@@ -5,7 +5,6 @@
 
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
-import matplotlib.pyplot as plt
 import time
 import scipy.io as io
  
