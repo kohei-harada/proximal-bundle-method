@@ -14,3 +14,6 @@ class Param:
         self.etau = 0.9
         self.isDebug = False
         self.mode = "normal"
+        # self.methods = ["ipm_exact", "ipm_inexact", "cda_exact", "cda_inexact", "cda_special"]
+        # self.methods = ["ipm_exact"]
+        self.methods = ["cda_special"]

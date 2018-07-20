@@ -6,40 +6,12 @@ import scipy as sp
 from numpy.random import *
 import time
 import param
+import problems
 from dualCoordinate import *
 from copy import deepcopy
 import cvxopt
-
-sys.path.append("problems")
-
-import GeneralizedMAXQ_10
-import GeneralizedMXHILB_10
-import GeneralizedMXHILB_100
-import GeneralizedMXHILB_1000
-import ChainedLQ_10
-import ChainedLQ_100
-import ChainedLQ_1000
-import ChainedCB3_I_10
-import ChainedCB3_II_10
-import ChainedCB3_II_100
-import ChainedCB3_II_1000
-import EVD52 
-import RosenSuzuki 
-import maxquad 
-import DEM
-import Shor
-import TiltedNorm_10
-import TiltedNorm_50
-import TiltedNorm_100
-import TiltedNorm_500
-import MQ_10
-import MQ_50
-import MQ_100
-import MQ_500
-import bays29
-import hk48
-import ch130
-import pcb442
+import logging
+from logging import getLogger, StreamHandler, Formatter
 
 def descentTest(f, fnext, mnext, gamma, m):
     if f - fnext >= 0:
@@ -47,7 +19,7 @@ def descentTest(f, fnext, mnext, gamma, m):
     else:
         return False
 
-def ipmByCvxopt(ycenter, b, g, Lambda, gamma, isDebug):
+def ipmByCvxopt(ycenter, b, g, Lambda, gamma, logger):
     n = len(ycenter)
     P = cvxopt.matrix(np.eye(n+1))/Lambda
     P[n,n] = 0.0
@@ -60,23 +32,24 @@ def ipmByCvxopt(ycenter, b, g, Lambda, gamma, isDebug):
     cvxopt.solvers.options['show_progress'] = False
     cvxopt.solvers.options['abstol'] = gamma
     sol = cvxopt.solvers.qp(P, q, G=A, h=bb)
-    if isDebug:
-        print "iteration:", sol['iterations']
+    logger.debug("iteration: %s" % sol['iterations'])
     yPlusR = np.array(sol['x']).flatten()
     gAggregatedTmp = np.dot(g.T, sol['z'])
     gAggregated = gAggregatedTmp.flatten()
     affineValues = np.dot(g, yPlusR[0:n]) + b
     return (yPlusR[0:n].tolist(), np.dot(affineValues, sol['z'])[0], gAggregated.tolist())
 
-def isOptimal(fcenter, fnext, mnext, eps, n, ynext, ycenter, gamma, isDebug):
-    if isDebug:
-        print "delta:", fcenter - mnext + gamma, "fcenter:", fcenter, "fnext:", fnext, "mnext:", mnext, "gamma:", gamma
-    if fcenter - mnext + gamma <= 0 and isDebug:
-        print "Negative delta detected!"
+def isOptimal(fcenter, fnext, mnext, eps, n, ynext, ycenter, gamma, logger):    
+    logger.debug("delta: " + str(fcenter - mnext + gamma)
+                 + " fcenter: " + str(fcenter)
+                 + " fnext: " + str(fnext)
+                 + " mnext: " + str(mnext)
+                 + " gamma: " + str(gamma))
+    if fcenter - mnext + gamma <= 0:
+        logger.debug("Negative delta detected!")
     deltaModified = np.absolute(fcenter - mnext + gamma)/(1.0 + np.absolute(fcenter))
     ydiff = np.array(ynext) - np.array(ycenter)
-    if isDebug:
-        print "delta/(1 + fcenter):", deltaModified
+    logger.debug("delta/(1 + fcenter): " + str(deltaModified))
     return (deltaModified <= eps, deltaModified)
 
 def frandomize(fnextLower, eta, isOracleRandomized):
@@ -85,12 +58,8 @@ def frandomize(fnextLower, eta, isOracleRandomized):
         fnextLower = fnextLower - eta*random()
     return fnextLower
 
-def debugPrint(str, isDebug):
-    if isDebug == True:
-        print str
-
-def solve(prob, method):
-    print "Problem_Name %30s" % prob.name()
+def solve(prob, method, logger):
+    print "Problem_Name                    %30s" % prob.name()
     status = False
     isIpm = False
     isCoordinate = False
@@ -107,12 +76,12 @@ def solve(prob, method):
     elif method == "ipm_inexact":
         (isIpm, isExact) = (True, False)
         (gamma, tau) = (para.gammaInit, 0.9)
-    elif method == "coordinate_exact":
+    elif method == "cda_exact":
         (isCoordinate, isExact) = (True, True)
-    elif method == "coordinate_inexact":
+    elif method == "cda_inexact":
         (isCoordinate, isExact) = (True, False)
         (gamma, tau) = (para.gammaInit, 0.9)
-    elif method == "coordinate_special":
+    elif method == "cda_special":
         (isCoordinate, isExact) = (True, False)
         (gamma, tau) = (para.gammaInit, 0.8)
         coordItrMax = 100
@@ -127,7 +96,7 @@ def solve(prob, method):
     bmax = para.bmax
     gammaMin = para.gammaMin
     isOracleRandomized = para.isOracleRandomized
-    isDebug = para.isDebug
+    # isDebug = para.isDebug
     if isExact == True:
         (gamma, tau) = (para.gammaMin, 1.0)        
     if isOracleRandomized == True:
@@ -159,9 +128,9 @@ def solve(prob, method):
     for i in range(imax):
         startModelMin = time.time()
         if isCoordinate:
-            (ynext, mnext, gAggregated) = coordinateDescent(len(y), coordItrMax, Lambda, np.array(g), np.array(b), np.array(ycenter), gamma, isDebug)
+            (ynext, mnext, gAggregated) = coordinateDescent(len(y), coordItrMax, Lambda, np.array(g), np.array(b), np.array(ycenter), gamma, logger)
         elif isIpm:
-            (ynext, mnext, gAggregated) = ipmByCvxopt(np.array(ycenter), np.array(b), np.array(g), Lambda, gamma, isDebug)
+            (ynext, mnext, gAggregated) = ipmByCvxopt(np.array(ycenter), np.array(b), np.array(g), Lambda, gamma, logger)
         endModelMin = time.time()
         timeModelMin += endModelMin - startModelMin
         (fnext, gnext) = prob.calcBoth(ynext)
@@ -178,14 +147,13 @@ def solve(prob, method):
             f.pop(0)
             g.pop(0)
             b.pop(0)
-        (optimal, deltaModified) = isOptimal(fcenterUpper, fnext, mnext, eps, n, ynext, ycenter, gamma, isDebug)
+        (optimal, deltaModified) = isOptimal(fcenterUpper, fnext, mnext, eps, n, ynext, ycenter, gamma, logger)
         if optimal:
             status = True
             break
         if descentTest(fcenterUpper, fnextUpper, mnext, gamma, 1.0e-3):
-            if isDebug:
-                print "Serious Step at %d" % i
-            elif i%10 == 0:
+            logger.debug("Serious Step at %d" % i)
+            if i%10 == 0:
                 print "iteration %4d, delta = %g" % (i, deltaModified)
                 sys.stdout.flush()
             seriousStep += 1
@@ -193,8 +161,7 @@ def solve(prob, method):
             if descentTest(fcenterUpper, fnextUpper, mnext, gamma, 1.0e-1):
                 if isBeforeSerious == False:
                     Lambda = para.Lambda
-                if isDebug:
-                    print "Enlarge Lambda!"
+                logger.debug("Enlarge Lambda!")
                 Lambda *= 2.0
             isBeforeSerious = True            
             ycenter = ynext
@@ -203,9 +170,8 @@ def solve(prob, method):
             for (ary, body) in zip([y,f,g,b], [ynext,fnextLower,gnext,bnext]):
                 ary.append(body)    
         else:
-            if isDebug:
-                print "Null Step at %d" % i
-            elif i%10 == 0:
+            logger.debug("Null Step at %d" % i)
+            if i%10 == 0:
                 print "iteration %4d, delta = %g" % (i, deltaModified)
                 sys.stdout.flush()
             isBeforeSerious = False
@@ -226,25 +192,25 @@ def printBoth(wf1, wf2, str):
     wf2.write(str)
 
 if __name__ == "__main__":
-    problems = [EVD52, RosenSuzuki, maxquad, DEM, Shor, \
-                GeneralizedMAXQ_10, \
-                GeneralizedMXHILB_10, GeneralizedMXHILB_100, GeneralizedMXHILB_1000, \
-                ChainedLQ_10, ChainedLQ_100, ChainedLQ_1000, \
-                ChainedCB3_I_10, \
-                ChainedCB3_II_10, ChainedCB3_II_100, ChainedCB3_II_1000, \
-                MQ_10, MQ_50, MQ_100, MQ_500, \
-                TiltedNorm_10, TiltedNorm_50, TiltedNorm_100, TiltedNorm_500,
-                bays29, hk48, ch130, pcb442]
-    problems = [bays29]
+    testset = problems.testset
     para = param.Param()
     mode = para.mode
-    methods = []
-    if sys.argv[1] == "all":
-        methods = ["ipm_exact", "ipm_inexact", "coordinate_exact", "coordinate_inexact", "coordinate_special"]
-    elif sys.argv[1] == "exact":
-        methods = ["ipm_exact", "coordinate_exact"]
+    methods = para.methods
+
+    # Preparation for logging
+    logger = getLogger("bundle")
+    stream_handler = StreamHandler()
+    if para.isDebug == True:
+        logger.setLevel(logging.DEBUG)
+        stream_handler.setLevel(logging.DEBUG)
     else:
-        methods.append(sys.argv[1])
+        logger.setLevel(logging.ERROR)
+        stream_handler.setLevel(logging.ERROR)
+    # handler_format = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler_format = Formatter('- %(levelname)s - %(message)s')
+    stream_handler.setFormatter(handler_format)
+    logger.addHandler(stream_handler)
+    
     if mode == "develop":
         sf = time.strftime("_%Y_%m_%d_%H_%M", time.localtime())
         with open(os.path.join("output", "output" + sf + ".csv"), "w") as wf:
@@ -256,11 +222,11 @@ if __name__ == "__main__":
             for method in methods:
                 wf.write(",OC(SC), CPU(MM), status")
             wf.write("\n")
-            for prob in problems:
+            for prob in testset:
                 print prob.name(), method
                 wf.write("%s,%d" % (prob.name(), prob.ndim()))
                 for method in methods:
-                    (fcenter, ycenter, itr, seriousItr, status, elapsedTime, timeModelMin) = solve(prob, method)
+                    (fcenter, ycenter, itr, seriousItr, status, elapsedTime, timeModelMin) = solve(prob, method, logger)
                     if status == True:
                         statusStr = "T"
                     else:
@@ -268,9 +234,9 @@ if __name__ == "__main__":
                     wf.write(",%d(%d),%.1f(%.1f),%s" % (itr, seriousItr, elapsedTime, timeModelMin, statusStr))
                 wf.write("\n")
     if mode == "normal":
-        for prob in problems:
+        for prob in testset:
             for method in methods:
-                (fcenter, ycenter, itr, seriousItr, status, elapsedTime, timeModelMin) = solve(prob, method)
+                (fcenter, ycenter, itr, seriousItr, status, elapsedTime, timeModelMin) = solve(prob, method, logger)
                 if status == True:
                     statusStr = "Optimal"
                 else:
@@ -285,7 +251,7 @@ if __name__ == "__main__":
                     printBoth(sys.stdout, wf, ("Serious_Steps                   %30d\n" % seriousItr))
                     printBoth(sys.stdout, wf, ("Model_Minimization_Algorithm    %30s\n" % method))
                     printBoth(sys.stdout, wf, ("Elapsed_Time(sec)               %30.2f\n" % elapsedTime))
-                    printBoth(sys.stdout, wf, ("Model_Minimization_Time         %30.2f\n" % timeModelMin))
+                    printBoth(sys.stdout, wf, ("Model_Minimization_Time(sec)    %30.2f\n" % timeModelMin))
                     printBoth(sys.stdout, wf, ("Optimal_Point:\n"))
                     n = prob.ndim()
                     for i in range(n):

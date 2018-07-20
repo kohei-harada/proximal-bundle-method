@@ -64,7 +64,7 @@ def calcPDgap(Lambda, theta, ycenter, g, b):
     ret = np.dot(theta, diff)
     return ret
 
-def coordinateDescent(N, itrmax, Lambda, g, b, ycenter, gamma, isDebug):
+def coordinateDescent(N, itrmax, Lambda, g, b, ycenter, gamma, logger):
     theta = np.ones(N)/float(N)
     for itr in range(itrmax):
         i = itr % N
@@ -91,16 +91,14 @@ def coordinateDescent(N, itrmax, Lambda, g, b, ycenter, gamma, isDebug):
         theta += t*d
         gap = calcPDgap(Lambda, theta, ycenter, g, b)
         if gap <= gamma:
-            if isDebug:
-                print "reach the gap!", itr
+            logger.debug("reach the gap! " + str(itr))
             break
     gap = calcPDgap(Lambda, theta, ycenter, g, b)
     gtTheta = np.dot(g.T, theta)
     xdash = ycenter - Lambda * gtTheta
     affines = np.dot(g, xdash) + b
     mnext = np.dot(theta, affines)
-    if isDebug:
-        print "gap = ", gap, "gamma = ", gamma
+    logger.debug("gap = " + str(gap) + " gamma = " + str(gamma))
     return(xdash, mnext, gtTheta)
     
 if __name__ == "__main__":

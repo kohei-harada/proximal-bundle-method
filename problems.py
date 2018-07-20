@@ -28,6 +28,7 @@ import bays29
 import hk48
 import ch130
 import pcb442
+import sample
 
 testset = [EVD52, RosenSuzuki, maxquad, DEM, Shor, \
            GeneralizedMAXQ_10, \
@@ -38,4 +39,5 @@ testset = [EVD52, RosenSuzuki, maxquad, DEM, Shor, \
            MQ_10, MQ_50, MQ_100, MQ_500, \
            TiltedNorm_10, TiltedNorm_50, TiltedNorm_100, TiltedNorm_500,
            bays29, hk48, ch130, pcb442]
-# testset = [bays29]
+testset = [bays29]
+testset = [sample]
