@@ -2,8 +2,8 @@ import numpy as np
 
 # Function setParam set original parameters for the problem.
 # The argument p is a instance of class Param defined at param.py
-# Usually, all you have to do is to return p as is, i.e. all parameters are default.
-# If you would like to solve multiple problems for one-shot and the necessary parameters
+# Usually, all you have to do is just returnning p as is, i.e. all parameters are default.
+# If you would like to solve multiple problems one-shot and the necessary parameters
 # are different one another, you need to use setParam individually.
 # Otherwise, change param.py directly is prefered.
 def setParam(p):
@@ -30,7 +30,7 @@ def calcObj(x):
 def calcGrad(x):
     return np.array([x[0] - 2.0, 2.0*(x[1] + 1.0)])
 
-# Function calcBoth returns the objective and a subgradient for a given point x
+# Function calcBoth returns the objective value and a subgradient for a given point x
 # This function plays the role of the "oracle" of the problem
 def calcBoth(x):
     f = calcObj(x)
