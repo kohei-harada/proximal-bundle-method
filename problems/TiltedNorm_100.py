@@ -52,6 +52,6 @@ def calcAll(y, isCorrect):
 if __name__ == "__main__":
     n = ndim()
     x = np.zeros(n)
-    print calcObj(x)
-    print calcGrad(x)
+    print(calcObj(x))
+    print(calcGrad(x))
     

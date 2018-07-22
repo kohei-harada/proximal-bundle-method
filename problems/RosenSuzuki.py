@@ -41,6 +41,6 @@ def calcAll(y, isCorrect):
 
 if __name__ == "__main__":
     y = np.array([0.0, 1.0, 2.0, -1.0])
-    print calcObj(y)
-    print calcObjs(y)
-    print calcGrad(y)
+    print(calcObj(y))
+    print(calcObjs(y))
+    print(calcGrad(y))

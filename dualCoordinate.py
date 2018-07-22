@@ -107,6 +107,6 @@ if __name__ == "__main__":
     N = len(f)
     b = calcIntercept(f, g, y)
     (theta, gap) = coordinateDescent(N, Lambda, g, b, ycenter)
-    print theta
-    print gap
+    print(theta)
+    print(gap)
     

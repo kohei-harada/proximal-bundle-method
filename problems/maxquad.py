@@ -72,4 +72,4 @@ if __name__ == "__main__":
         rvec = (random(10) - 0.5)*1.0e-2
         (f, g) = calcBoth(rvec, True)
         if f <= 0:
-            print i,f
+            print(i,f)

@@ -55,6 +55,6 @@ def calcAll(y, isCorrect):
 if __name__ == "__main__":
     n = ndim()
     x = np.arange(n)
-    print calcObjs(x)
-    print calcObj(x)
-    print calcGrad(x)
+    print(calcObjs(x))
+    print(calcObj(x))
+    print(calcGrad(x))

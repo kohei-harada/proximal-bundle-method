@@ -50,10 +50,10 @@ if __name__ == "__main__":
     Y = X.astype(np.int32)
     startime = time.time()
     edge_list = minimum_spanning_tree(Y)
-    print time.time() - startime
-    print edge_list
+    print(time.time() - startime)
+    print(edge_list)
     startime = time.time()
     edge_list = minimum_spanning_tree(X, "float")
-    print time.time() - startime
-    print edge_list
+    print(time.time() - startime)
+    print(edge_list)
     

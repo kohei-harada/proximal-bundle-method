@@ -53,5 +53,5 @@ if __name__ == "__main__":
     # x = np.arange(10)
     n = ndim()
     x = np.zeros(n)
-    print calcObj(x)
-    print calcGrad(x)
+    print(calcObj(x))
+    print(calcGrad(x))

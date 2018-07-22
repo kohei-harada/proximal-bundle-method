@@ -57,5 +57,5 @@ def calcAll(y, isCorrect):
 
 if __name__ == "__main__":
     y = np.array([1.0,1.0,1.0,1.0,2.0])
-    print calcObj(y)
-    print calcGrad(y)
+    print(calcObj(y))
+    print(calcGrad(y))

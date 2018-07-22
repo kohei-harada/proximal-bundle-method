@@ -40,7 +40,7 @@ def calcAll(y, isCorrect):
 
 if __name__ == "__main__":
     x = np.array([1.0, 1.0])
-    print calcObj(x)
-    print calcObjs(x)
-    print calcGrad(x)
+    print(calcObj(x))
+    print(calcObjs(x))
+    print(calcGrad(x))
 

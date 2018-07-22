@@ -86,6 +86,6 @@ if __name__ == "__main__":
 ,0,-2,2,0])
     # x = np.array([2*i for i in range(n)])
     # M2 = update(M, x)
-    print calcObj(x)
+    print(calcObj(x))
 
     

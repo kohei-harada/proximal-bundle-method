@@ -81,11 +81,9 @@ def calcAll(y, isCorrect):
 
 if __name__ == "__main__":
     x = np.array([2.0 for i in range(n)])
-    # x = np.array([0,0,1,0,-2,-1,1,1,1,-1,1,1,1,-1,-2,0,1,0,-1,0,1,1,1,1,0,0,-2,2,0])
-    # x = np.array([2*i for i in range(n)])
-    print M
+    print(M)
     M2 = update(M, x)
-    print M2
-    # print calcObj(x)
+    print(M2)
+    
 
     

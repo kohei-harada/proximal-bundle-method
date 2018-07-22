@@ -80,6 +80,6 @@ def calcAll(y, isCorrect):
 
 if __name__ == "__main__":
     x = np.array([2 for i in range(n)])
-    print calcObj(x)
+    print(calcObj(x))
 
     

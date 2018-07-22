@@ -59,7 +59,7 @@ def frandomize(fnextLower, eta, isOracleRandomized):
     return fnextLower
 
 def solve(prob, method, logger):
-    print "Problem_Name                    %30s" % prob.name()
+    print("Problem_Name                    %30s" % prob.name())
     status = False
     isIpm = False
     isCoordinate = False
@@ -86,7 +86,7 @@ def solve(prob, method, logger):
         (gamma, tau) = (para.gammaInit, 0.8)
         coordItrMax = 100
     else:
-        print "Method %s does not exist!" % method
+        print("Method %s does not exist!" % method)
         sys.exit(10)
     imax = para.imax
     n = prob.ndim()
@@ -122,7 +122,7 @@ def solve(prob, method, logger):
     # It judges wether previous step is serious(True) or null(False)
     isBeforeSerious = False
     seriousStep = 0
-    print "Preperation end."
+    print("Preperation end.")
     sys.stdout.flush()
     
     for i in range(imax):
@@ -154,7 +154,7 @@ def solve(prob, method, logger):
         if descentTest(fcenterUpper, fnextUpper, mnext, gamma, 1.0e-3):
             logger.debug("Serious Step at %d" % i)
             if i%10 == 0:
-                print "iteration %4d, delta = %g" % (i, deltaModified)
+                print(print "iteration %4d, delta = %g" % (i, deltaModified))
                 sys.stdout.flush()
             seriousStep += 1
             # Enlarge Lambda if it isexpected to be too small
@@ -172,7 +172,7 @@ def solve(prob, method, logger):
         else:
             logger.debug("Null Step at %d" % i)
             if i%10 == 0:
-                print "iteration %4d, delta = %g" % (i, deltaModified)
+                print("iteration %4d, delta = %g" % (i, deltaModified))
                 sys.stdout.flush()
             isBeforeSerious = False
             if gamma >= gammaMin:
@@ -223,7 +223,7 @@ if __name__ == "__main__":
                 wf.write(",OC(SC), CPU(MM), status")
             wf.write("\n")
             for prob in testset:
-                print prob.name(), method
+                print(prob.name(), method)
                 wf.write("%s,%d" % (prob.name(), prob.ndim()))
                 for method in methods:
                     (fcenter, ycenter, itr, seriousItr, status, elapsedTime, timeModelMin) = solve(prob, method, logger)
@@ -241,7 +241,7 @@ if __name__ == "__main__":
                     statusStr = "Optimal"
                 else:
                     statusStr = "Non_Optimal"
-                print "[result]"
+                print("[result]")
                 with open(prob.name() + ".sol", "w") as wf:
                     printBoth(sys.stdout, wf, ("Problem_Name                    %30s\n" % prob.name()))
                     printBoth(sys.stdout, wf, ("Number_Of_Variables             %30d\n" % prob.ndim()))
