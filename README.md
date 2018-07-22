@@ -10,6 +10,7 @@ This product can solve non-smooth unconstrained convex optimization problems wit
 
 - scipy
 - numpy
+- autograd
 - cvxopt
 
 ## Usage
