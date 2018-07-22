@@ -154,7 +154,7 @@ def solve(prob, method, logger):
         if descentTest(fcenterUpper, fnextUpper, mnext, gamma, 1.0e-3):
             logger.debug("Serious Step at %d" % i)
             if i%10 == 0:
-                print(print "iteration %4d, delta = %g" % (i, deltaModified))
+                print("iteration %4d, delta = %g" % (i, deltaModified))
                 sys.stdout.flush()
             seriousStep += 1
             # Enlarge Lambda if it isexpected to be too small
