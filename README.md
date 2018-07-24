@@ -6,6 +6,10 @@ A python implementation of proximal bundle method for non-smooth unconstrained c
 
 This product can solve non-smooth unconstrained convex optimization problems without commercial solvers.
 
+## Demo
+
+![Demo](https://github.com/kohei-harada/proximal-bundle-method/usage.gif)
+
 ## Requirement
 
 - scipy
