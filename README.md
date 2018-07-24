@@ -8,7 +8,7 @@ This product can solve non-smooth unconstrained convex optimization problems wit
 
 ## Demo
 
-![Demo](https://github.com/kohei-harada/proximal-bundle-method/usage.gif)
+![Demo](https://github.com/kohei-harada/proximal-bundle-method/blob/master/usage.gif)
 
 ## Requirement
 
